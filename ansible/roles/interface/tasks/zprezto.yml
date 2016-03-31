@@ -1,0 +1,37 @@
+---
+
+- name: Install zsh packages
+  apt: pkg={{ item }} state=installed update_cache=yes
+  sudo: yes
+  with_items:
+    - zsh
+
+- name: Change shell to zsh
+  sudo: yes
+  user: name={{ username }} shell=/bin/zsh
+
+- name: Check if zprezto is present
+  stat: path=~/.zprezto
+  become: yes
+  become_user: "{{ username }}"
+  register: zprezto_folder
+
+- name: Clone zprezto package
+  git: repo=https://github.com/sorin-ionescu/prezto.git dest=~/.zprezto recursive=yes
+  become: yes
+  become_user: "{{ username }}"
+  when: zprezto_folder.stat.exists == False
+
+- name: Copy zprezto config files
+  become: yes
+  become_user: "{{ username }}"
+  shell: setopt EXTENDED_GLOB; for rcfile in "${ZDOTDIR:-$HOME}"/.zprezto/runcoms/^README.md(.N); do rm -f "${ZDOTDIR:-$HOME}/.${rcfile:t}"; ln -s "$rcfile" "${ZDOTDIR:-$HOME}/.${rcfile:t}"; done
+  args:
+    executable: /bin/zsh
+  when: zprezto_folder.stat.exists == False
+
+
+- name: Ensure promptinit line exists in .zshrc
+  become: yes
+  become_user: "{{ username }}"
+  lineinfile: dest=~/.zshrc line="autoload -Uz promptinit; promptinit; prompt steeef"

@@ -14,5 +14,6 @@
     - vim
     - ncdu
     - dos2unix
+    - python-mysqldb
   tags:
     - run_update

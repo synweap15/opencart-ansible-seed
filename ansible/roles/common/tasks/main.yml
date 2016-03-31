@@ -1,0 +1,18 @@
+---
+
+- name: Install common packages
+  apt: pkg={{item}} state=installed update_cache=yes
+  sudo: yes
+  with_items:
+    - zsh
+    - git
+    - python
+    - python-dev
+    - python-pip
+    - build-essential
+    - tmux
+    - vim
+    - ncdu
+    - dos2unix
+  tags:
+    - run_update

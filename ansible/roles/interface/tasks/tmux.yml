@@ -1,0 +1,17 @@
+---
+
+- name: Install tmux packages
+  apt: pkg={{ item }} state=installed update_cache=yes
+  sudo: yes
+  with_items:
+    - tmux
+
+- name: Copy .tmux.conf file
+  become: yes
+  become_user: "{{ username }}"
+  copy: src=.tmux.conf dest=~/.tmux.conf
+
+- name: Run DOS2UNIX on .tmux.conf file
+  become: yes
+  become_user: "{{ username }}"
+  shell: dos2unix ~/.tmux.conf

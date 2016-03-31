@@ -1,0 +1,6 @@
+---
+
+- include: zprezto.yml username=root
+- include: zprezto.yml
+- include: tmux.yml username=root
+- include: tmux.yml

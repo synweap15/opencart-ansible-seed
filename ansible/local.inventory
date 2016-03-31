@@ -1,0 +1,5 @@
+[app]
+localhost ansible_ssh_user=vagrant ansible_sudo_pass=vagrant ansible_connection=local
+
+[all:vars]
+local=True

@@ -1,0 +1,8 @@
+db_root_password: vagrant
+
+db_db: opencart
+db_user: opencart
+db_password: vagrant
+
+backend_username: admin
+backend_password: admin

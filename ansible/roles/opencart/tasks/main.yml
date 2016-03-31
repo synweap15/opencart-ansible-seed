@@ -1,0 +1,45 @@
+---
+
+- name: Set debconf for mysql password
+  shell: echo 'mysql-server mysql-server/{{ item }} password {{ db_root_password }}' | debconf-set-selections
+  become: yes
+  with_items:
+    - root_password
+    - root_password_again
+
+- name: Install packages required by OpenCart
+  apt: pkg={{item}} state=installed update_cache=yes
+  become: yes
+  with_items:
+    - apache2
+    - mcrypt
+    - php5
+    - php5-mcrypt
+    - mysql-server
+    - mysql-client
+    - php5-curl
+    - php5-gd
+    - php5-mysql
+
+- name: Create MySQL user
+  mysql_user: login_user=root login_password={{ db_root_password }} name={{ db_user }} password={{ db_password }} priv={{ db_db }}.*:ALL state=present
+
+- name: Create MySQL database
+  mysql_db: login_user={{ db_user }} login_password={{ db_password }} name={{ db_db }} state=present
+
+- name: Enable PHP5 mcrypt module
+  shell: php5enmod mcrypt
+  become: yes
+
+- name: Restart Apache2
+  shell: service apache2 restart
+  become: yes
+
+- name: Delete default index.html file
+  file: path=/var/www/html/index.html state=absent
+
+- name: Link OpenCart files to /var/www/html
+  file: src=/vagrant/app/upload dest=/var/www/html owner=www-data group=www-data state=link force=yes
+
+- name: Run OpenCart cli-installer
+  shell: cd /var/www/html/install && php cli_install.php install --db_hostname localhost --db_username {{ db_user }} --db_password {{ db_password }} --db_database {{ db_db }} --db_driver mysqli --db_port 3306 --username {{ backend_username }} --password {{ backend_password }} --email admin@localhost --http_server http://localhost:8090/

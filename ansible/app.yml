@@ -1,0 +1,6 @@
+---
+- hosts: app
+  roles:
+    - common
+    - interface
+    - opencart
